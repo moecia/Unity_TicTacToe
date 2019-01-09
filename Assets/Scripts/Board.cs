@@ -6,19 +6,22 @@ using UnityEngine.UI;
 
 namespace TicTactoe
 {
+    /// <summary>
+    /// Board store all cells informations, providing methods for build/ delete/ reset cells' data and decides is a winner exist for every round.
+    /// </summary>
     [RequireComponent(typeof(GridLayoutGroup))]
-    [RequireComponent(typeof(RectTransform))]
+    [RequireComponent(typeof(RectTransform))]  
     public class Board : MonoBehaviour
     {
         public static Board Instance { get; private set; }
-
+        // How many chess in a line that player can win the game.
         public int ItemToWin { get; private set; }
 
         public GameObject cell_prefab;
-        private Cell[,] cells;
+
+        public Cell[,] Cells { get; private set; }
 
         private Player currentPlayer;
-        private Cell lastChangedCell;
         private event Action<Player, Cell> onBoardChange;
 
         public void Init()
@@ -28,51 +31,68 @@ namespace TicTactoe
             Instance = this;
 
             ItemToWin = 3;
-
             print(DateTime.Now.ToString() + "： Board instance initialization complete.");
         }
 
-        public static void BuildBoard(int row, int col, Action<Player, Cell> onBoardChange)
+        /// <summary>
+        /// Build a row * col size board.
+        /// </summary>
+        /// <param name="row">How many rows of the board in total</param>
+        /// <param name="col">How many columns of the board in total</param>
+        /// <param name="onBoardChange">OnBoardChange action delegate</param>
+        public void BuildCells(int row, int col, Action<Player, Cell> onBoardChange)
         {
-            Instance.onBoardChange = onBoardChange;
+            this.onBoardChange = onBoardChange;
 
-            Vector2 panelSize = Instance.GetComponent<RectTransform>().sizeDelta;
-            Instance.GetComponent<GridLayoutGroup>().cellSize = new Vector2(panelSize.x / row, panelSize.x / col);
+            Vector2 panelSize = GetComponent<RectTransform>().sizeDelta;
+            GetComponent<GridLayoutGroup>().cellSize = new Vector2(panelSize.x / row, panelSize.x / col);
 
-            Instance.cells = new Cell[row, col];
+            Cells = new Cell[row, col];
             for (int i = 0; i < row; i++)
             {
                 for (int j = 0; j < col; j++)
                 {
-                    GameObject tmp = Instantiate(Instance.cell_prefab);
-                    tmp.transform.SetParent(Instance.transform);
+                    GameObject tmp = Instantiate(cell_prefab);
+                    tmp.transform.SetParent(transform);
                     tmp.transform.localScale = new Vector3(1, 1, 1);
 
                     Cell cell = tmp.GetComponent<Cell>();
                     cell.Init(i, j, Instance.OnCellClick);
-                    Instance.cells[i, j] = cell;
+                    Cells[i, j] = cell;
                 }
             }            
             print(DateTime.Now.ToString() + "： Board generation complete.");
         }
 
-        public static void ResetBoard()
+        // Delete all cell objects.
+        public void DeleteCells()
         {
-            foreach (Cell cell in Instance.cells)
+            foreach (Cell cell in Cells)
+            {
+                Destroy(cell.transform.gameObject);
+            }
+            print(DateTime.Now.ToString() + "： Board Delete complete.");
+        }
+
+        // Delete all cell data, but it won't destory cell objects.
+        public void ResetCells()
+        {
+            foreach (Cell cell in Cells)
             {
                 cell.Clear();
             }
             print(DateTime.Now.ToString() + "： Board Reset complete.");
         }
 
-        public static void SetPlayer(Player player)
+        public void SetPlayer(Player player)
         {
-            Instance.currentPlayer = player;
+            currentPlayer = player;
+            UI_Manager.Instance.FlipIndicator(currentPlayer);
         }
 
-        public static Player WinCheck(Cell cell)
+        public Player WinCheck(Cell cell)
         {
-            if (Instance.CheckRow(cell.Row, cell.Col) || Instance.CheckCol(cell.Row, cell.Col) || Instance.CheckDiag(cell.Row, cell.Col))
+            if (CheckRow(cell.Row, cell.Col) || CheckCol(cell.Row, cell.Col) || CheckDiag(cell.Row, cell.Col))
                 return cell.OccupiedPlayer;
             return null;
         }
@@ -82,8 +102,7 @@ namespace TicTactoe
             // Debug.Log(currentPlayer.Name);          
             if (Instance.currentPlayer != null && cell.OccupiedPlayer.Index == -1)
             {
-                cell.Set(Instance.currentPlayer);               
-                Instance.lastChangedCell = cell;
+                cell.Set(Instance.currentPlayer);
                 if (Instance.onBoardChange != null)
                 {
                    onBoardChange(currentPlayer, cell);
@@ -96,14 +115,14 @@ namespace TicTactoe
             int counter = 1;
             for (int i = row - 1; i >= 0; i--)
             {
-                if (Instance.cells[i, col].OccupiedPlayer.PlayerSymbol == currentPlayer.PlayerSymbol)
+                if (Instance.Cells[i, col].OccupiedPlayer.PlayerSymbol == currentPlayer.PlayerSymbol)
                     counter++;
                 else
                     break;
             }
-            for (int i = row + 1; i < cells.GetLength(0); i++)
+            for (int i = row + 1; i < Cells.GetLength(0); i++)
             {
-                if (Instance.cells[i, col].OccupiedPlayer.PlayerSymbol == currentPlayer.PlayerSymbol)
+                if (Instance.Cells[i, col].OccupiedPlayer.PlayerSymbol == currentPlayer.PlayerSymbol)
                     counter++;
                 else
                     break;
@@ -118,14 +137,14 @@ namespace TicTactoe
             int counter = 1;
             for (int i = col - 1; i >= 0; i--)
             {
-                if (Instance.cells[row, i].OccupiedPlayer.PlayerSymbol == currentPlayer.PlayerSymbol)
+                if (Instance.Cells[row, i].OccupiedPlayer.PlayerSymbol == currentPlayer.PlayerSymbol)
                     counter++;
                 else
                     break;
             }
-            for (int i = col + 1; i < cells.GetLength(0); i++)
+            for (int i = col + 1; i < Cells.GetLength(0); i++)
             {
-                if (Instance.cells[row, i].OccupiedPlayer.PlayerSymbol == currentPlayer.PlayerSymbol)
+                if (Instance.Cells[row, i].OccupiedPlayer.PlayerSymbol == currentPlayer.PlayerSymbol)
                     counter++;
                 else
                     break;
@@ -137,43 +156,45 @@ namespace TicTactoe
 
         private bool CheckDiag(int row, int col)
         {
-            int counter = 1;
+            int counter_0 = 1;
 
             int i = row - 1, j = col - 1;
             while (i >= 0 && j >= 0)
             {
-                if (Instance.cells[i--, j--].OccupiedPlayer.PlayerSymbol == currentPlayer.PlayerSymbol)
-                    counter++;
+                if (Instance.Cells[i--, j--].OccupiedPlayer.PlayerSymbol == currentPlayer.PlayerSymbol)
+                    counter_0++;
                 else
                     break;
             }
             i = row + 1; j = col + 1;
-            while (i < cells.GetLength(0) && j < cells.GetLength(1))
+            while (i < Cells.GetLength(0) && j < Cells.GetLength(1))
             {
-                if (Instance.cells[i++, j++].OccupiedPlayer.PlayerSymbol == currentPlayer.PlayerSymbol)
-                    counter++;
+                if (Instance.Cells[i++, j++].OccupiedPlayer.PlayerSymbol == currentPlayer.PlayerSymbol)
+                    counter_0++;
                 else
                     break;
             }
+            // Debug.Log(string.Format("Round {0}, Player {1} has {2} items in the right diagonal of row {3} col {4}.", GameManager.Instance.Round, currentPlayer.Index, counter_0, row, col));
+            int counter_1 = 1;
             i = row - 1; j = col + 1;
-            while (i >= 0 && j < cells.GetLength(1))
+            while (i >= 0 && j < Cells.GetLength(1))
             {
-                if (Instance.cells[i--, j++].OccupiedPlayer.PlayerSymbol == currentPlayer.PlayerSymbol)
-                    counter++;
+                if (Instance.Cells[i--, j++].OccupiedPlayer.PlayerSymbol == currentPlayer.PlayerSymbol)
+                    counter_1++;
                 else
                     break;
             }
             i = row + 1; j = col - 1;
-            while (i < cells.GetLength(0) && j >= 0)
+            while (i < Cells.GetLength(0) && j >= 0)
             {
-                if (Instance.cells[i++, j--].OccupiedPlayer.PlayerSymbol == currentPlayer.PlayerSymbol)
-                    counter++;
+                if (Instance.Cells[i++, j--].OccupiedPlayer.PlayerSymbol == currentPlayer.PlayerSymbol)
+                    counter_1++;
                 else
                     break;
             }
 
-            Debug.Log(string.Format("Round {0}, Player {1} has {2} items in the diagonal of row {3} col {4}.", GameManager.Instance.Round, currentPlayer.Index, counter, row, col));
-            return counter >= ItemToWin ? true : false;
+            //Debug.Log(string.Format("Round {0}, Player {1} has {2} items in the left diagonal of row {3} col {4}." , GameManager.Instance.Round, currentPlayer.Index, counter_1, row, col));
+            return (counter_0 >= ItemToWin || counter_1 >= ItemToWin) ? true : false;
         }       
     }
 }

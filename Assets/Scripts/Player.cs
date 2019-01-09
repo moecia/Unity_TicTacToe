@@ -13,6 +13,12 @@ namespace TicTactoe
         public int Score { get; private set; }
         public PlayerSymbol PlayerSymbol { get; private set; }
 
+        /// <summary>
+        /// Player constructor
+        /// </summary>
+        /// <param name="name">Player's name, should be unique.</param>
+        /// <param name="index">Player's name, should be unique.</param>
+        /// <param name="playerSymbol">Player's symbol, should be unique.</param>
         public Player(string name, int index, PlayerSymbol playerSymbol)
         {
             Name = name;
@@ -21,6 +27,9 @@ namespace TicTactoe
             Score = 0;
         }
 
+        /// <summary>
+        /// Player default constructor
+        /// </summary>
         public Player()
         {
             Name = "No User";
@@ -32,6 +41,11 @@ namespace TicTactoe
         public void IncrementScore()
         {
             Score += 1;
+        }
+
+        public void ResetScore()
+        {
+            Score = 0;
         }
     }
 }

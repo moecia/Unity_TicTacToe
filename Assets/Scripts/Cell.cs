@@ -6,6 +6,9 @@ using UnityEngine.EventSystems;
 
 namespace TicTactoe
 {
+    /// <summary>
+    /// Cell is an object holding occupied player information, row and column.
+    /// </summary>
     public class Cell : MonoBehaviour, IPointerClickHandler
     {
         public GameObject spriteChip;
@@ -18,19 +21,30 @@ namespace TicTactoe
 
         private event Action<Cell> onCellClick;
 
+        /// <summary>
+        /// Initialize a cell object
+        /// </summary>
+        /// <param name="row">Indicate which row of the board it is on.</param>
+        /// <param name="col">Indicate which column of the board it is on.</param>
+        /// <param name="onCellClick">OnCellClick action delegate</param>
         public void Init(int row, int col, Action<Cell> onCellClick)
         {
             Row = row;
             Col = col;
-            OccupiedPlayer = new Player();
+
             name = string.Format("Cell [{0}, {1}]", row, col);
             this.onCellClick = onCellClick;
         }
 
+        /// <summary>
+        /// Set the ocupied player of the cell.
+        /// </summary>
+        /// <param name="occupiedPlayer"></param>
         public void Set(Player occupiedPlayer)
         {
-            OccupiedPlayer = occupiedPlayer;
-
+            // Copy the current player data to the cell.
+            OccupiedPlayer = new Player(occupiedPlayer.Name, occupiedPlayer.Index, occupiedPlayer.PlayerSymbol);
+    
             switch (occupiedPlayer.PlayerSymbol)
             {
                 case PlayerSymbol.Chip:
@@ -44,6 +58,9 @@ namespace TicTactoe
             }
         }
 
+        /// <summary>
+        /// Delete cell data and reset cell image.
+        /// </summary>
         public void Clear()
         {
             OccupiedPlayer = new Player();
