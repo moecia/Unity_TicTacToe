@@ -57,7 +57,7 @@ namespace TicTactoe
                     tmp.transform.localScale = new Vector3(1, 1, 1);
 
                     Cell cell = tmp.GetComponent<Cell>();
-                    cell.Init(i, j, Instance.OnCellClick);
+                    cell.Init(i, j, OnCellClick);
                     Cells[i, j] = cell;
                 }
             }            
@@ -100,10 +100,10 @@ namespace TicTactoe
         private void OnCellClick(Cell cell)
         {
             // Debug.Log(currentPlayer.Name);          
-            if (Instance.currentPlayer != null && cell.OccupiedPlayer.Index == -1)
+            if (currentPlayer != null && cell.OccupiedPlayer.Index == -1)
             {
-                cell.Set(Instance.currentPlayer);
-                if (Instance.onBoardChange != null)
+                cell.Set(currentPlayer);
+                if (onBoardChange != null)
                 {
                    onBoardChange(currentPlayer, cell);
                 }             
@@ -115,14 +115,14 @@ namespace TicTactoe
             int counter = 1;
             for (int i = row - 1; i >= 0; i--)
             {
-                if (Instance.Cells[i, col].OccupiedPlayer.PlayerSymbol == currentPlayer.PlayerSymbol)
+                if (Cells[i, col].OccupiedPlayer.PlayerSymbol == currentPlayer.PlayerSymbol)
                     counter++;
                 else
                     break;
             }
             for (int i = row + 1; i < Cells.GetLength(0); i++)
             {
-                if (Instance.Cells[i, col].OccupiedPlayer.PlayerSymbol == currentPlayer.PlayerSymbol)
+                if (Cells[i, col].OccupiedPlayer.PlayerSymbol == currentPlayer.PlayerSymbol)
                     counter++;
                 else
                     break;
@@ -137,14 +137,14 @@ namespace TicTactoe
             int counter = 1;
             for (int i = col - 1; i >= 0; i--)
             {
-                if (Instance.Cells[row, i].OccupiedPlayer.PlayerSymbol == currentPlayer.PlayerSymbol)
+                if (Cells[row, i].OccupiedPlayer.PlayerSymbol == currentPlayer.PlayerSymbol)
                     counter++;
                 else
                     break;
             }
             for (int i = col + 1; i < Cells.GetLength(0); i++)
             {
-                if (Instance.Cells[row, i].OccupiedPlayer.PlayerSymbol == currentPlayer.PlayerSymbol)
+                if (Cells[row, i].OccupiedPlayer.PlayerSymbol == currentPlayer.PlayerSymbol)
                     counter++;
                 else
                     break;
@@ -161,7 +161,7 @@ namespace TicTactoe
             int i = row - 1, j = col - 1;
             while (i >= 0 && j >= 0)
             {
-                if (Instance.Cells[i--, j--].OccupiedPlayer.PlayerSymbol == currentPlayer.PlayerSymbol)
+                if (Cells[i--, j--].OccupiedPlayer.PlayerSymbol == currentPlayer.PlayerSymbol)
                     counter_0++;
                 else
                     break;
@@ -169,7 +169,7 @@ namespace TicTactoe
             i = row + 1; j = col + 1;
             while (i < Cells.GetLength(0) && j < Cells.GetLength(1))
             {
-                if (Instance.Cells[i++, j++].OccupiedPlayer.PlayerSymbol == currentPlayer.PlayerSymbol)
+                if (Cells[i++, j++].OccupiedPlayer.PlayerSymbol == currentPlayer.PlayerSymbol)
                     counter_0++;
                 else
                     break;
@@ -179,7 +179,7 @@ namespace TicTactoe
             i = row - 1; j = col + 1;
             while (i >= 0 && j < Cells.GetLength(1))
             {
-                if (Instance.Cells[i--, j++].OccupiedPlayer.PlayerSymbol == currentPlayer.PlayerSymbol)
+                if (Cells[i--, j++].OccupiedPlayer.PlayerSymbol == currentPlayer.PlayerSymbol)
                     counter_1++;
                 else
                     break;
@@ -187,7 +187,7 @@ namespace TicTactoe
             i = row + 1; j = col - 1;
             while (i < Cells.GetLength(0) && j >= 0)
             {
-                if (Instance.Cells[i++, j--].OccupiedPlayer.PlayerSymbol == currentPlayer.PlayerSymbol)
+                if (Cells[i++, j--].OccupiedPlayer.PlayerSymbol == currentPlayer.PlayerSymbol)
                     counter_1++;
                 else
                     break;

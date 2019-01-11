@@ -32,8 +32,6 @@ namespace TicTactoe
                 winnerNofity.text = "Draw!";
             else
                 winnerNofity.text = winnerName + " win this turn!";
-
-            Recorder.Instance.Save();
         }
 
         public void UpdateScore(Player[] players)

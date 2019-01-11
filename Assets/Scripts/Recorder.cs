@@ -19,7 +19,8 @@ namespace TicTactoe
             public int col;
         }
 
-        public static Recorder Instance { get; private set;}
+        public static Recorder Instance { get; private set; }
+        public string testLoadDataFilename = "Sample";
         private List<Move> steps;
 
         public void Init()
@@ -83,7 +84,7 @@ namespace TicTactoe
 
         public void TestLoadData()
         {
-            Move[] moves = Recorder.Instance.Load("Sample");
+            Move[] moves = Recorder.Instance.Load(testLoadDataFilename);
             int i = 0;
             foreach (Move move in moves)
                 print(string.Format("At round {0}, Player ID {1} set a chess at row:{2} col:3", i++, move.player.Index, move.row, move.col));

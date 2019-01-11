@@ -13,6 +13,8 @@ namespace TicTactoe
         public static GameManager Instance { get; private set; }
 
         public Player[] Players { get; private set; }
+        // Initilize in editor
+        public String[] playersName;
 
         public int Round { get; private set; }
 
@@ -28,8 +30,10 @@ namespace TicTactoe
         public void SetPlayer()
         {
             Players = new Player[2];
-            Players[0] = new Player("Player_0", 0, PlayerSymbol.Chip);
-            Players[1] = new Player("Player_1", 1, PlayerSymbol.Club);
+            Players[0] = new Player(playersName[0], 0, PlayerSymbol.Chip);
+            Players[1] = new Player(playersName[1], 1, PlayerSymbol.Club);
+            Debug.Log("ori: " + Players[0].GetHashCode());
+            Debug.Log("ori: " + Players[1].GetHashCode());
         }
 
         #region Button Calls
@@ -69,14 +73,14 @@ namespace TicTactoe
         private void OnBoardChange(Player player, Cell cell)
         {
             Round++;
-
+            // Check whether winner exist
             Board.Instance.SetPlayer(player);
             Player winner = Board.Instance.WinCheck(cell);
-
+            
             Recorder.Instance.SetStep(Round, player, cell.Row, cell.Col);
 
             if (winner != null)
-            {
+            {               
                 winner.IncrementScore();
                 UI_Manager.Instance.UpdateScore(Players);
                 UI_Manager.Instance.gameOverMenu.SetActive(true);
@@ -89,7 +93,8 @@ namespace TicTactoe
                     UI_Manager.Instance.gameOverMenu.SetActive(true);
                     UI_Manager.Instance.GameOverText();
                     return;
-                }               
+                }              
+                // Turn to next player
                 int nextIndex = player.Index;
                 nextIndex = player.Index < Players.Length - 1 ? nextIndex += 1 : 0;
                 Player next = Players[nextIndex];

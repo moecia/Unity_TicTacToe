@@ -42,9 +42,9 @@ namespace TicTactoe
         /// <param name="occupiedPlayer"></param>
         public void Set(Player occupiedPlayer)
         {
-            // Copy the current player data to the cell.
-            OccupiedPlayer = new Player(occupiedPlayer.Name, occupiedPlayer.Index, occupiedPlayer.PlayerSymbol);
-    
+            // Point to current player.
+            OccupiedPlayer = occupiedPlayer;
+
             switch (occupiedPlayer.PlayerSymbol)
             {
                 case PlayerSymbol.Chip:
